@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "786787857896",
+    "project_id": "firecruds-87e2d",
+    "storage_bucket": "firecruds-87e2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786787857896:android:ac3166e46833038a1ea05d",
+        "android_client_info": {
+          "package_name": "com.singhthatcodes.firecruds"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdD7NzHVREWUSJXOi4dw5DRY-sc0bR-z4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
