@@ -1,74 +1,80 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fire_cruds/styles/colors.dart';
 import 'package:fire_cruds/services/firestore.dart';
+import 'package:fire_cruds/styles/text.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({Key? key})
+      : super(key: key); // Added missing key parameter and fixed super call
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  //firestore object
   final FirestoreService firestoreService = FirestoreService();
-  //text controllers
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-  //open a dialog box to add content
+
   void openNoteBox({String? docID}) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(),
-                ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(),
               ),
-              SizedBox(height: 16), // Adding spacing between text fields
-              TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(),
               ),
-            ],
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                if (docID == null) {
-                  firestoreService.addNote(
-                      titleController.text, descriptionController.text);
-                } else {
-                  firestoreService.updateNote(
-                      docID, titleController.text, descriptionController.text);
-                }
-                //clear the controller
-                titleController.clear();
-                descriptionController.clear();
-
-                //close the box
-                Navigator.pop(context);
-              },
-              child: const Text('Create Note'),
-            )
-          ]),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              if (docID == null) {
+                firestoreService.addNote(
+                    titleController.text, descriptionController.text);
+              } else {
+                firestoreService.updateNote(
+                    docID, titleController.text, descriptionController.text);
+              }
+              titleController.clear();
+              descriptionController.clear();
+              Navigator.pop(context);
+            },
+            child: const Text('Create Note'),
+          )
+        ],
+      ),
     );
   }
+
+  bool done = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.grey,
       appBar: AppBar(
-        title: Text("Notes"),
+        backgroundColor: AppColors.grey,
+        shadowColor: AppColors.beige,
+        title: Text("Noter", style: AppStyles.title),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
@@ -82,42 +88,73 @@ class _HomeState extends State<Home> {
             return ListView.builder(
               itemCount: notesList.length,
               itemBuilder: (context, index) {
-                //get each individual doc
                 DocumentSnapshot document = notesList[index];
                 String docID = document.id;
-
-                //get note from each doc
                 Map<String, dynamic> data =
                     document.data() as Map<String, dynamic>;
                 String noteText = data['note'];
+                Timestamp time = data['timestamp'];
 
-                //display as list tile
-                return ListTile(
-                  title: Text(noteText),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.update),
+                return Padding(
+                  padding: const EdgeInsets.only(
+                      top: 16, bottom: 12, left: 4, right: 4),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(2.5),
+                      border: Border.all(
+                          //color: AppColors.beige,
+                          //width: 1.0,
+                          ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.grey,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: IconButton(
                         onPressed: () {
-                          openNoteBox(docID: docID);
+                          setState(() {
+                            done = !done;
+                          });
                         },
+                        icon: done
+                            ? Icon(Icons.radio_button_checked,
+                                color: AppColors.applegreen)
+                            : Icon(Icons.radio_button_unchecked),
+                        color: AppColors.grey,
                       ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          firestoreService.deleteNote(docID);
-                        },
+                      title: Text(noteText,
+                          style: GoogleFonts.aladin(color: AppColors.beige)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.update, color: AppColors.beige),
+                            onPressed: () {
+                              openNoteBox(docID: docID);
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: AppColors.beige),
+                            onPressed: () {
+                              firestoreService.deleteNote(docID);
+                            },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 );
               },
             );
           } else {
             return Center(
-                child:
-                    CircularProgressIndicator()); // Show a loading indicator if data is still loading
+              child: CircularProgressIndicator(),
+            );
           }
         },
       ),

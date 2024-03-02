@@ -1,5 +1,6 @@
 import 'package:fire_cruds/firebase_options.dart';
 import 'package:fire_cruds/screens/home.dart';
+import 'package:fire_cruds/screens/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(debugShowCheckedModeBanner: false, home: Home());
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: Login());
   }
 }
